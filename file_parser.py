@@ -1,4 +1,6 @@
-def file_parser(filename):
+#! /usr/bin/env python3
+
+def fileParser(filename):
 	with open(filename) as f:
 		numCities = int(f.readline())
 		numItems = int(f.readline())
@@ -27,4 +29,4 @@ def saveMatrix(num, f, type):
 	return distanceMatrix
 
 if __name__ == '__main__':
-	file_parser('Tests/10/10_3_1_25.txt')
+	fileParser('Tests/10/10_3_1_25.txt')
