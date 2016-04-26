@@ -79,14 +79,14 @@ def initializationCities(numCities, popSize):
 
 
 if __name__ == '__main__':
-	probMutation = 1
-	probCrossover = 1
-	numRuns = 1
+	probMutation = 0.1
+	probCrossover = 0.9
+	numRuns = 30
 	popSize = 10
 	elitePercent = 1
 	tourSize = 3
 	generations = 20
-	mutationOperators = [mutation(1, 0.1)]
+	mutationOperators = [mutation(1, probMutation)]
 	crossoverOperator = sample_cross
 	fitnessFunction = fitness
 	testsFolder = 'Tests/'
