@@ -21,6 +21,12 @@ def run(probMutation, probCrossover, popSize, tour_selection, crossoverOperator,
 	itemsPop = initializationItems(numItems, numCities, popSize)
 	citiesPop = initializationCities(numCities, popSize)
 
+	for i in range(len(citiesPop)):
+		pos = citiesPop[i][0].index(1)
+		temp = citiesPop[i][0][pos]
+		citiesPop[i][0][pos] = citiesPop[i][0][0]
+		citiesPop[i][0][0] = temp
+
 	# evaluate pop here
 	fitnessList = [0 for i in range(popSize)]
 	itemsPop = [(itemsPop[i][0], fitnessList[i]) for i in range(len(fitnessList))]
@@ -82,4 +88,8 @@ if __name__ == '__main__':
 	mutationOperators = [mutation(1, 0.1)]
 	crossoverOperator = sample_cross
 	fitnessFunction = fitness
-	main('Tests/10/10_3_1_25.txt', 'Results/10/10_3_1_25_result.txt', probMutation, probCrossover, numRuns, popSize, tour_sel(tourSize), crossoverOperator, mutationOperators, sel_survivors_elite(elitePercent), fitnessFunction, generations)
+	testsFolder = 'Tests/'
+	resultsFolder = 'Results/'
+	numberCities = '10'
+	filename = numberCities + '/' + numberCities + '_3_1_25.txt'
+	main(testsFolder + filename, resultsFolder + filename, probMutation, probCrossover, numRuns, popSize, tour_sel(tourSize), crossoverOperator, mutationOperators, sel_survivors_elite(elitePercent), fitnessFunction, generations)
