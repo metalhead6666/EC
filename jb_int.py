@@ -5,7 +5,6 @@ Ernesto Costa, February, 2016
 """
 
 from sea_int_2016 import *
-from utils_2016 import *
 
 # João Brandão
 
