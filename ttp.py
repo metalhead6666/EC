@@ -5,6 +5,7 @@ from random import randint, sample, choice
 from jb_int import *
 from sea_int_2016 import *
 from time import strftime
+from fitness import fitness
 
 def main(filename, filesave, probMutation, probCrossover, numRuns, popSize, tour_selection, crossoverOperator, mutationOperators, selection_survivors_elite, fitnessFunction, generations):
 	numCities, numItems, knapsackWeight, vMax, vMin, coefficient, dropRate, distanceMatrix, weightValueItems, availabilityItems = fileParser(filename)
@@ -78,9 +79,9 @@ def initializationCities(numCities, popSize):
 
 
 if __name__ == '__main__':
-	probMutation = 0.1
-	probCrossover = 0.9
-	numRuns = 30
+	probMutation = 1
+	probCrossover = 1
+	numRuns = 1
 	popSize = 10
 	elitePercent = 1
 	tourSize = 3
