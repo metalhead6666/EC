@@ -29,7 +29,7 @@ def run(probMutation, probCrossover, popSize, tour_selection, crossoverOperator,
 		citiesPop[i][0][0] = temp
 
 	# evaluate pop here
-	fitnessList = [0 for i in range(popSize)]
+	fitnessList = [fitness(numCities, numItems, citiesPop[i][0], itemsPop[i][0], distanceMatrix, weightValueItems, availabilityItems, vMax, vMin, knapsackWeight, coefficient, dropRate) for i in range(popSize)]
 	itemsPop = [(itemsPop[i][0], fitnessList[i]) for i in range(len(fitnessList))]
 	citiesPop = [(citiesPop[i][0], fitnessList[i]) for i in range(len(fitnessList))]
 
@@ -42,29 +42,30 @@ def run(probMutation, probCrossover, popSize, tour_selection, crossoverOperator,
 		for j in range(0, popSize - 1, 2):
 			indivItem1 = matePoolItems[j]
 			indivItem2 = matePoolItems[j + 1]
-			sonsItems = crossoverOperator(indivItem1, indivItem2, probCrossover)
+			crossover = choice(crossoverOperator)
+			sonsItems = crossover(indivItem1, indivItem2, probCrossover)
 
 			indivCities1 = matePoolCities[j]
 			indivCities2 = matePoolCities[j + 1]
-			sonsCities = crossoverOperator(indivCities1, indivCities2, probCrossover)
+			sonsCities = crossover(indivCities1, indivCities2, probCrossover)
 
 		descendentesItems = []
-		for cromo, fit in progenitoresItems:
-			mutation = choice(mutationOperators)
-			newCromo = mutation(cromo, numItems)
-			descendentesItems.append((newCromo, 0)) # ALTERAR 0 POR FITNESS FUNCTION
-
 		descendentesCities = []
-		for cromo, fit in progenitoresCities:
+		for i in range(len(progenitoresItems)):
 			mutation = choice(mutationOperators)
-			newCromo = mutation(cromo, numCities)
-			descendentesCities.append((newCromo, 0)) # ALTERAR 0 POR FITNESS FUNCTION
+			newCromoItem = mutation(progenitoresItems[i][0], numItems)
+			mutation = choice(mutationOperators)
+			newCromoCity = mutation(progenitoresCities[i][0], numCities)
+			value = fitness(numCities, numItems, newCromoCity, newCromoItem, distanceMatrix, weightValueItems, availabilityItems, vMax, vMin, knapsackWeight, coefficient, dropRate)
+
+			descendentesItems.append((newCromoItem, value)) # ALTERAR 0 POR FITNESS FUNCTION			
+			descendentesCities.append((newCromoCity, value)) # ALTERAR 0 POR FITNESS FUNCTION
 
 		itemsPop = selection_survivors_elite(itemsPop, descendentesItems)
 		citiesPop = selection_survivors_elite(citiesPop, descendentesCities)
 
 		# evaluate the new population
-		fitnessList = [0 for i in range(popSize)]
+		fitnessList = [fitness(numCities, numItems, citiesPop[i][0], itemsPop[i][0], distanceMatrix, weightValueItems, availabilityItems, vMax, vMin, knapsackWeight, coefficient, dropRate) for i in range(popSize)]
 		itemsPop = [(itemsPop[i][0], fitnessList[i]) for i in range(len(fitnessList))]
 		citiesPop = [(citiesPop[i][0], fitnessList[i]) for i in range(len(fitnessList))]
 
@@ -72,7 +73,7 @@ def run(probMutation, probCrossover, popSize, tour_selection, crossoverOperator,
 	return best_pops
 	
 def initializationItems(numItems, numCities, popSize):
-	return [([randint(1, numCities) for i in range(numItems)], 0) for i in range(popSize)]
+	return [([randint(0, numCities) for i in range(numItems)], 0) for i in range(popSize)]
 
 def initializationCities(numCities, popSize):	
 	return [(sample(list(range(1, numCities + 1)), numCities), 0) for i in range(popSize)]
@@ -81,13 +82,13 @@ def initializationCities(numCities, popSize):
 if __name__ == '__main__':
 	probMutation = 0.1
 	probCrossover = 0.9
-	numRuns = 30
-	popSize = 10
+	numRuns = 1
+	popSize = 1000
 	elitePercent = 1
-	tourSize = 3
-	generations = 20
+	tourSize = 10
+	generations = 200
 	mutationOperators = [mutation(1, probMutation)]
-	crossoverOperator = sample_cross
+	crossoverOperator = [sample_cross, merge_cross]
 	fitnessFunction = fitness
 	testsFolder = 'Tests/'
 	resultsFolder = 'Results/'
