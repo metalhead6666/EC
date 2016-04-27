@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 from file_parser import fileParser
-from random import randint, sample, choice
+from random import randint, sample, choice, random
 from jb_int import *
 from sea_int_2016 import *
 from time import strftime
@@ -29,7 +29,7 @@ def run(probMutation, probCrossover, popSize, tour_selection, crossoverOperator,
 		citiesPop[i][0][0] = temp
 
 	# evaluate pop here
-	fitnessList = [fitness(numCities, numItems, citiesPop[i][0], itemsPop[i][0], distanceMatrix, weightValueItems, availabilityItems, vMax, vMin, knapsackWeight, coefficient, dropRate) for i in range(popSize)]
+	fitnessList = [fitness(numCities, numItems, i[0], j[0], distanceMatrix, weightValueItems, availabilityItems, vMax, vMin, knapsackWeight, coefficient, dropRate) for i, j in zip(citiesPop, itemsPop)]
 	itemsPop = [(itemsPop[i][0], fitnessList[i]) for i in range(len(fitnessList))]
 	citiesPop = [(citiesPop[i][0], fitnessList[i]) for i in range(len(fitnessList))]
 
@@ -44,18 +44,20 @@ def run(probMutation, probCrossover, popSize, tour_selection, crossoverOperator,
 			indivItem2 = matePoolItems[j + 1]
 			crossover = choice(crossoverOperator)
 			sonsItems = crossover(indivItem1, indivItem2, probCrossover)
+			progenitoresItems.extend(sonsItems)
 
 			indivCities1 = matePoolCities[j]
 			indivCities2 = matePoolCities[j + 1]
 			sonsCities = crossover(indivCities1, indivCities2, probCrossover)
+			progenitoresCities.extend(sonsCities)
 
+		#print(len(progenitoresItems), len(progenitoresCities))
 		descendentesItems = []
 		descendentesCities = []
 		for i in range(len(progenitoresItems)):
-			mutation = choice(mutationOperators)
-			newCromoItem = mutation(progenitoresItems[i][0], numItems)
-			mutation = choice(mutationOperators)
-			newCromoCity = mutation(progenitoresCities[i][0], numCities)
+			newCromoItem = mutationOperators(progenitoresItems[i][0], numCities)
+			newCromoCity = mutationOperators(progenitoresCities[i][0], numCities)
+			#print(newCromoItem, newCromoCity)
 			value = fitness(numCities, numItems, newCromoCity, newCromoItem, distanceMatrix, weightValueItems, availabilityItems, vMax, vMin, knapsackWeight, coefficient, dropRate)
 
 			descendentesItems.append((newCromoItem, value)) # ALTERAR 0 POR FITNESS FUNCTION			
@@ -63,9 +65,11 @@ def run(probMutation, probCrossover, popSize, tour_selection, crossoverOperator,
 
 		itemsPop = selection_survivors_elite(itemsPop, descendentesItems)
 		citiesPop = selection_survivors_elite(citiesPop, descendentesCities)
+		#print(len(citiesPop[0][0]))
+		#popSize = len(itemsPop)
 
 		# evaluate the new population
-		fitnessList = [fitness(numCities, numItems, citiesPop[i][0], itemsPop[i][0], distanceMatrix, weightValueItems, availabilityItems, vMax, vMin, knapsackWeight, coefficient, dropRate) for i in range(popSize)]
+		fitnessList = [fitness(numCities, numItems, i[0], j[0], distanceMatrix, weightValueItems, availabilityItems, vMax, vMin, knapsackWeight, coefficient, dropRate) for i, j in zip(citiesPop, itemsPop)]		
 		itemsPop = [(itemsPop[i][0], fitnessList[i]) for i in range(len(fitnessList))]
 		citiesPop = [(citiesPop[i][0], fitnessList[i]) for i in range(len(fitnessList))]
 
@@ -78,26 +82,45 @@ def initializationItems(numItems, numCities, popSize):
 def initializationCities(numCities, popSize):	
 	return [(sample(list(range(1, numCities + 1)), numCities), 0) for i in range(popSize)]
 
+def mutationStuff(probMutation):
+	def mutationIndiv(cromo, dimension):
+		for i in range(len(cromo)):
+			if random() < probMutation:
+				cromo[i] = randint(1, dimension)
+
+		return cromo
+	return mutationIndiv
+
+def crossover(indiv1, indiv2, probCrossover):
+	if random() < probCrossover:
+		value = randint(1, len(indiv1[0]) - 1)
+		newIndiv1 = indiv1[0][:value] + indiv2[0][value:]
+		newIndiv2 = indiv2[0][:value] + indiv1[0][value:]
+		return ((newIndiv1, 0), (newIndiv2, 0))
+	return indiv1, indiv2
+
 
 if __name__ == '__main__':
 	probMutation = 0.1
-	probCrossover = 0.9
+	probCrossover = 0.5
 	numRuns = 30
 	popSize = 500
-	elitePercent = 1
-	tourSize = popSize*0.01
-	generations = 100
-	mutationOperators = [mutation(2, probMutation)]
-	crossoverOperator = [sample_cross, merge_cross]
+	elitePercent = 0.05
+	tourSize = int(popSize*0.01)
+	generations = 200
+	mutationOperators = mutation(1, probMutation)
+	crossoverOperator = [crossover]
 	fitnessFunction = fitness
 	testsFolder = 'Tests/'
 	resultsFolder = 'Results/'
-	numberCities = '10'
-	numberItems = '3'
+	numberCities = ['10', '20', '50', '100']
+	numberItems = ['5']
 	instanceNum = [i for i in range(1, 11)]
 	tightness = ['25', '50', '75']
 
-	for i in instanceNum:
-		for j in tightness:
-			filename = numberCities + '/' + numberCities + '_' + numberItems + '_' + str(i) + '_' + j + '.txt'
-			main(testsFolder + filename, resultsFolder + filename, probMutation, probCrossover, numRuns, popSize, tour_sel(tourSize), crossoverOperator, mutationOperators, sel_survivors_elite(elitePercent), fitnessFunction, generations)
+	for z in numberCities:
+		for k in numberItems:
+			for i in instanceNum:
+				for j in tightness:
+					filename = z + '/' + z + '_' + k + '_' + str(i) + '_' + j + '.txt'
+					main(testsFolder + filename, resultsFolder + filename, probMutation, probCrossover, numRuns, popSize, tour_sel(tourSize), crossoverOperator, mutationOperators, sel_survivors_elite(elitePercent), fitnessFunction, generations)

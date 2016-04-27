@@ -4,6 +4,10 @@ def fitness(numCities, numItems, x, z, distanceMatrix, weightValueItems, availab
 	if x[0] != 1:
 		return 0
 
+	for i in range(1, numCities + 1):
+		if x.count(i) > 1:
+			return 0
+
 	times_item = [-1]*numItems
 	Wc = 0
 	vc = 0
@@ -11,6 +15,7 @@ def fitness(numCities, numItems, x, z, distanceMatrix, weightValueItems, availab
 
 	#Calculate TIME of the tour
 	for i in range(0, numCities):
+		#print(i, numCities, x)
 		next_city = x[(i+1)%numCities]
 		array_items = []
 		current_city = x[i]
