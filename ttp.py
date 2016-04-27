@@ -82,16 +82,22 @@ def initializationCities(numCities, popSize):
 if __name__ == '__main__':
 	probMutation = 0.1
 	probCrossover = 0.9
-	numRuns = 1
-	popSize = 1000
+	numRuns = 30
+	popSize = 500
 	elitePercent = 1
-	tourSize = 10
-	generations = 200
-	mutationOperators = [mutation(1, probMutation)]
+	tourSize = popSize*0.01
+	generations = 100
+	mutationOperators = [mutation(2, probMutation)]
 	crossoverOperator = [sample_cross, merge_cross]
 	fitnessFunction = fitness
 	testsFolder = 'Tests/'
 	resultsFolder = 'Results/'
 	numberCities = '10'
-	filename = numberCities + '/' + numberCities + '_3_1_25.txt'
-	main(testsFolder + filename, resultsFolder + filename, probMutation, probCrossover, numRuns, popSize, tour_sel(tourSize), crossoverOperator, mutationOperators, sel_survivors_elite(elitePercent), fitnessFunction, generations)
+	numberItems = '3'
+	instanceNum = [i for i in range(1, 11)]
+	tightness = ['25', '50', '75']
+
+	for i in instanceNum:
+		for j in tightness:
+			filename = numberCities + '/' + numberCities + '_' + numberItems + '_' + str(i) + '_' + j + '.txt'
+			main(testsFolder + filename, resultsFolder + filename, probMutation, probCrossover, numRuns, popSize, tour_sel(tourSize), crossoverOperator, mutationOperators, sel_survivors_elite(elitePercent), fitnessFunction, generations)
