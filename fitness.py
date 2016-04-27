@@ -1,4 +1,4 @@
-def fitness(numCities, numItems, x, z, distanceMatrix, weightValueItems, availabilityItems, vMax, vMin, knapsackWeight, coefficient):
+def fitness(numCities, numItems, x, z, distanceMatrix, weightValueItems, availabilityItems, vMax, vMin, knapsackWeight, coefficient, dropRate):
 	
 	#If the first city in the tour is not 1, return 0
 	if x[0] != 1:
@@ -18,16 +18,18 @@ def fitness(numCities, numItems, x, z, distanceMatrix, weightValueItems, availab
 		if z.count(current_city)>0:
 			for j in range(z.index(current_city), numItems):
 				#Check if item j was taken from city i, and also if it exists there
-				if z[j] == current_city and availabilityItems[current_city-1][j]==1:
+				#print(j, len(availabilityItems), current_city-1)
+				if z[j] == current_city and availabilityItems[j][current_city-1]==1:					
 					array_items.append(j)
 
 				#If item doesn't exist in city, return 0
-				elif z[j] == current_city and availabilityItems[current_city-1][j]==0:
+				elif z[j] == current_city and availabilityItems[j][current_city-1]==0:
 					return 0
 
 		#Calculate weight on knapsack
 		if len(array_items) > 0:
 			for j in array_items:
+				#print(j, len(weightValueItems[0]), len(array_items))
 				Wc = Wc + weightValueItems[0][j]
 
 				#If current weight is bigger than the capacity of the knapsack, return 0
@@ -53,5 +55,5 @@ def fitness(numCities, numItems, x, z, distanceMatrix, weightValueItems, availab
 			profit_total = profit_total + weightValueItems[1][i]*dropRate**(time_bag/coefficient)
 
 	#print(profit_total)
-
+	#print(profit_total, time_total)
 	return profit_total/time_total
