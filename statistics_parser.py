@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import numpy as np
 
 def dataFromFile(filename, nRuns):
 	aux = filename.split('/')
@@ -55,9 +56,11 @@ def dataFromFile(filename, nRuns):
 
 		plt.plot([i for i in range(1, nRuns+1)], fitness, '-o')
 		if best_index >= 0:
+			mean = np.mean(fitness)
 			props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
-			plt.text(best_index+1.25, fitness[best_index], 'Tour: ' + str(best_tour) + '\nItems: ' + str(best_item) + '\nFitness: ' + str(best_fitness), bbox=props)
+			plt.text(0.5, fitness[best_index]*0.95, 'BEST\nTour: ' + str(best_tour) + '\nItems: ' + str(best_item) + '\nFitness: ' + str(best_fitness) + '\nAverage Best of all runs: ' + str(mean), bbox=props)
 
+		plt.xticks([i for i in range(1, nRuns+1)])
 		plt.ylabel('Fitness')
 		plt.xlabel('Runs')
 
@@ -67,6 +70,6 @@ def dataFromFile(filename, nRuns):
 
 
 if __name__ == '__main__':
-	filename = 'Results/20/20_5_6_75.txt'
+	filename = 'Results/20/20_5_1_50.txt'
 	nRuns = 30
 	dataFromFile(filename, nRuns)
