@@ -1,9 +1,12 @@
 import matplotlib.pyplot as plt
+import matplotlib.pylab as lab
 import numpy as np
+from os import listdir
+from os.path import isfile, join
 
-def dataFromFile(filename, nRuns):
+
+def dataFromFile(filename, nRuns, city, showPlot):
 	aux = filename.split('/')
-
 	aux = aux[2].split('.')
 	nCities,nItems, dummy1, dummy2 = aux[0].split('_')
 	nCities = int(nCities)
@@ -63,13 +66,38 @@ def dataFromFile(filename, nRuns):
 		plt.xticks([i for i in range(1, nRuns+1)])
 		plt.ylabel('Fitness')
 		plt.xlabel('Runs')
-
 		mng = plt.get_current_fig_manager()
 		mng.window.showMaximized()
-		plt.show()
+
+		
+		if showPlot == 0:			
+			name = 'Graphs/' + filename[8:-3] + 'png'
+			lab.savefig(name)
+		else:
+			plt.show()
+		
+		plt.clf()
 
 
 if __name__ == '__main__':
-	filename = 'Results/20/20_5_1_50.txt'
+	resultsFolder = 'Results/'
+	graphsFolder = 'Graphs/'
+	numberCities = ['10', '20', '50', '100']
 	nRuns = 30
-	dataFromFile(filename, nRuns)
+	showPlot = 1
+
+	"""
+	for k in numberCities:
+		mypath = resultsFolder + k + '/'
+		onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
+		for i in onlyfiles:
+			filename = mypath + i
+			dataFromFile(filename, nRuns, k, showPlot)
+		#print(onlyfiles)
+	"""
+	
+
+
+	filename = 'Results/50/50_15_1_75.txt'
+	
+	dataFromFile(filename, nRuns, '50', showPlot)

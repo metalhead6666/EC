@@ -4,15 +4,12 @@ def fitness(numCities, numItems, x, z, distanceMatrix, weightValueItems, availab
 	if x[0] != 1:
 		return 0
 
-	for i in range(1, numCities + 1):
-		if x.count(i) > 1:
-			return 0
-
 	times_item = [-1]*numItems
 	Wc = 0
 	vc = 0
 	time_total = 0
 
+	items_not_in_city = 0
 	#Calculate TIME of the tour
 	for i in range(0, numCities):
 		#print(i, numCities, x)
@@ -24,12 +21,17 @@ def fitness(numCities, numItems, x, z, distanceMatrix, weightValueItems, availab
 			for j in range(z.index(current_city), numItems):
 				#Check if item j was taken from city i, and also if it exists there
 				#print(j, len(availabilityItems), current_city-1)
+				array_items.append(j)
+				"""
 				if z[j] == current_city and availabilityItems[j][current_city-1]==1:					
 					array_items.append(j)
 
 				#If item doesn't exist in city, return 0
 				elif z[j] == current_city and availabilityItems[j][current_city-1]==0:
-					return 0
+					#print('Item not in city')
+					items_not_in_city += 1
+					#return 0
+				"""
 
 		#Calculate weight on knapsack
 		if len(array_items) > 0:
@@ -38,13 +40,19 @@ def fitness(numCities, numItems, x, z, distanceMatrix, weightValueItems, availab
 				Wc = Wc + weightValueItems[0][j]
 
 				#If current weight is bigger than the capacity of the knapsack, return 0
-				if Wc > knapsackWeight:
-					return 0
+				#if Wc > knapsackWeight:
+					#print(Wc - knapsackWeight)
+					#print('Peso overflow: ' + str(Wc - knapsackWeight))
+					#return 0
 				#Insert time in which the item was added to the bag
 				times_item[j] = time_total
 
 		#Increases time
-		vc = vMax - Wc*(vMax - vMin)/knapsackWeight
+		if Wc > knapsackWeight:
+			vc = vMin
+		else:
+			vc = vMax - Wc*(vMax - vMin)/knapsackWeight
+
 		distance_next_city = distanceMatrix[current_city-1][next_city-1]
 		time_total = time_total + distance_next_city/vc
 
@@ -56,9 +64,13 @@ def fitness(numCities, numItems, x, z, distanceMatrix, weightValueItems, availab
 
 	for i in range(numItems):
 		if times_item[i] != -1:
+			#print(time_total, times_item[i])
 			time_bag = time_total - times_item[i]
 			profit_total = profit_total + weightValueItems[1][i]*dropRate**(time_bag/coefficient)
 
-	#print(profit_total)
 	#print(profit_total, time_total)
-	return profit_total/time_total
+	
+	if Wc > knapsackWeight:
+		return (profit_total/time_total)/(coefficient*(Wc/knapsackWeight))
+
+	return (profit_total/time_total)
