@@ -124,11 +124,11 @@ def crossover(indiv1, indiv2, probCrossover):
 if __name__ == '__main__':
 	probMutation = 0.1
 	probCrossover = 0.5
-	numRuns = 1
-	popSize = 500
+	numRuns = 30
+	popSize = 1000
 	elitePercent = 0.05
 	tourSize = int(popSize*0.01)
-	generations = 250
+	generations = 400
 	mutationOperators = [mutation(1, probMutation), mutationItem(probMutation)]
 	crossoverOperator = [crossover]
 	fitnessFunction = fitness
