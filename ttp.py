@@ -135,24 +135,24 @@ if __name__ == '__main__':
 	testsFolder = 'Tests/'
 	resultsFolder = 'Results/Run/'
 	resultsFolderGen = 'Results/Generation/'
-	numberCities = ['20']
-	numberItems = ['5', '10', '20', '25']
-	instanceNum = [i for i in range(1, 11)]
-	tightness = ['25', '50', '75']
+	numberCities = ['100']
+	numberItems = ['5']
+	instanceNum = [1]
+	tightness = ['75']
 
-	"""
+	
 	for z in numberCities:
 		for k in numberItems:
 			for i in instanceNum:
 				for j in tightness:
 					filename = z + '/' + z + '_' + k + '_' + str(i) + '_' + j + '.txt'
-					main(testsFolder + filename, resultsFolder + filename, probMutation, probCrossover, numRuns, popSize, tour_sel(tourSize), crossoverOperator, mutationOperators, sel_survivors_elite(elitePercent), fitnessFunction, generations)
+					main(testsFolder + filename, resultsFolder + filename, resultsFolderGen + filename, probMutation, probCrossover, numRuns, popSize, tour_sel(tourSize), crossoverOperator, mutationOperators, sel_survivors_elite(elitePercent), fitnessFunction, generations)
 	
-	"""
+	
 
-	filename = '10/10_15_10_25.txt'
+	#filename = '10/10_15_10_25.txt'
 	#filename = 'test.txt'
-	main(testsFolder + filename, resultsFolder + filename, resultsFolderGen + filename, probMutation, probCrossover, numRuns, popSize, tour_sel(tourSize), crossoverOperator, mutationOperators, sel_survivors_elite(elitePercent), fitnessFunction, generations)
+	#main(testsFolder + filename, resultsFolder + filename, resultsFolderGen + filename, probMutation, probCrossover, numRuns, popSize, tour_sel(tourSize), crossoverOperator, mutationOperators, sel_survivors_elite(elitePercent), fitnessFunction, generations)
 
 
 	#20 cities
