@@ -135,17 +135,18 @@ if __name__ == '__main__':
 	testsFolder = 'Tests/'
 	resultsFolder = 'Results/Run/'
 	resultsFolderGen = 'Results/Generation/'
-	numberCities = ['100']
-	numberItems = ['5']
-	instanceNum = [1]
-	tightness = ['75']
+	numberCities = ['10', '20', '50', '100']
+	numberItems = [['3', '5', '10', '15'], ['5', '10', '20', '25'], ['15', '25', '50', '75'], ['3', '5', '25', '50', '100', '150']]
+	instanceNum = [i for i in range(1,11)]
+	tightness = ['25', '50', '75']
 
 	
-	for z in numberCities:
-		for k in numberItems:
+	for z in range(len(numberCities)):
+		for k in numberItems[z]:
 			for i in instanceNum:
 				for j in tightness:
-					filename = z + '/' + z + '_' + k + '_' + str(i) + '_' + j + '.txt'
+					filename = numberCities[z] + '/' + numberCities[z] + '_' + k + '_' + str(i) + '_' + j + '.txt'
+					print('Executing: ' + filename)
 					main(testsFolder + filename, resultsFolder + filename, resultsFolderGen + filename, probMutation, probCrossover, numRuns, popSize, tour_sel(tourSize), crossoverOperator, mutationOperators, sel_survivors_elite(elitePercent), fitnessFunction, generations)
 	
 	
