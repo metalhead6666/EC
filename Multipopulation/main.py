@@ -12,7 +12,7 @@ def solutions_exchanged(prob_mutation, prob_crossover, num_runs, pop_size, elite
 		population = initialization_indiv(pop_size, number_objects)
 
 		for i in range(len(population)):
-			population[i] = fitness(population[i], knapsack_capacity, number_objects, objects_weight, objects_profit)
+			population[i][-1], population[i][-2] = fitness(population[i], knapsack_capacity, number_objects, objects_weight, objects_profit)
 
 		for i in range(generations):
 			mate_pool = tour_selection(tour_size, population, number_objects)
@@ -27,12 +27,12 @@ def solutions_exchanged(prob_mutation, prob_crossover, num_runs, pop_size, elite
 
 			for j in range(len(offspring)):
 				offspring[j] = mutation(offspring[j], prob_mutation)
-				offspring[j] = fitness(offspring[j], knapsack_capacity, number_objects, objects_weight, objects_profit)				
+				offspring[j][-1], offspring[j][-2] = fitness(offspring[j], knapsack_capacity, number_objects, objects_weight, objects_profit)				
 
 			population = sel_survivors_elite(elite_percent, population, offspring)
 
 		for i in range(len(population)):
-			population[i] = fitness(population[i], knapsack_capacity, number_objects, objects_weight, objects_profit)
+			population[i][-1], population[i][-2] = fitness(population[i], knapsack_capacity, number_objects, objects_weight, objects_profit)
 
 		print(best_individual(population))
 
@@ -81,8 +81,8 @@ def one_tour(tour_size, population):
 def sel_survivors_elite(elite_percent, parents, offspring):
 	size_parents = len(parents)
 	comp_elite = int(size_parents * elite_percent)
-	parents = parents[parents[:, 1].argsort()[::-1]]
-	offspring = offspring[offspring[:, 1].argsort()[::-1]]
+	parents = parents[parents[:, -1].argsort()[::-1]]
+	offspring = offspring[offspring[:, -1].argsort()[::-1]]
 	new_population = np.append(parents[:comp_elite], offspring[:size_parents - comp_elite], axis = 0)
 	return new_population
 
@@ -95,15 +95,13 @@ def fitness(indiv, knapsack_capacity, number_objects, objects_weight, objects_pr
 		fitness_profit += indiv[i] * objects_profit[i]
 
 	if fitness_weight > knapsack_capacity:
-		indiv[-1] = indiv[-2] = 0
-	else:
-		indiv[-1] = fitness_profit
-		indiv[-2] = fitness_weight
+		return 0, 0
 
-	return indiv
+	return fitness_profit, fitness_weight
 
 def best_individual(population):
-	population = population[population[:, 1].argsort()[::-1]]
+	population = population[population[:, -1].argsort()[::-1]]
+	#print(population)
 	return population[0]
 
 def change_individuals():
