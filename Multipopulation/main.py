@@ -166,16 +166,16 @@ if __name__ == '__main__':
 	prob_mutation = 0.05
 	prob_crossover = 0.8
 	num_runs = 30
-	pop_size = 200
+	pop_size = 100
 	elite_percent = 0.05
 	tour_size = int(pop_size * 0.01)
-	generations = 100
-	change_solutions = 0.3
-	percentage_change = 0.1
+	generations = 40
+	change_solutions = 0.4
+	percentage_change = 0.2
 
 	# exchange solutions = True
 	# random individuals = False
-	type_algorithm = True
+	type_algorithm = False
 
 	file_number = 8
 	knapsack_capacity, number_objects, objects_weight, objects_profit = file_parser(file_number)
