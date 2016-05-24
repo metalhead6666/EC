@@ -1,6 +1,7 @@
 #! /usr/bin/env python3
 
 from file_parser import file_parser
+from math import ceil
 from random import sample
 import numpy as np
 
@@ -84,10 +85,12 @@ def crossover(indiv1, indiv2, prob_crossover):
 
 def mutation2(indiv, prob_mutation):
 	if np.random.random() < prob_mutation:
-		for i in range(len(indiv) - 2):
-			indiv[i] ^= 1
-
-	indiv[-1] = indiv[-2] = 0
+		index = sample(range(len(indiv) - 2), 2)
+		index1, index2 = index
+		temp = indiv[index1]
+		indiv[index1] = indiv[index2]
+		indiv[index2] = temp
+		indiv[-1] = indiv[-2] = 0	
 	return indiv
 
 def crossover2(indiv1, indiv2, prob_crossover):
@@ -163,19 +166,19 @@ def random_individuals(population, population2, size, number_objects):
 
 
 if __name__ == '__main__':
-	prob_mutation = 0.05
-	prob_crossover = 0.8
+	prob_mutation = 0.1
+	prob_crossover = 0.9
 	num_runs = 30
-	pop_size = 100
+	pop_size = 50
 	elite_percent = 0.05
-	tour_size = int(pop_size * 0.01)
-	generations = 40
-	change_solutions = 0.4
+	tour_size = ceil(pop_size * 0.01)
+	generations = 10
+	change_solutions = 0.5
 	percentage_change = 0.2
 
 	# exchange solutions = True
 	# random individuals = False
-	type_algorithm = False
+	type_algorithm = True
 
 	file_number = 8
 	knapsack_capacity, number_objects, objects_weight, objects_profit = file_parser(file_number)
