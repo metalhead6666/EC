@@ -75,7 +75,7 @@ def tour_selection(tour_size, population, number_objects):
 def one_tour(tour_size, population):
     pool = sample(list(population), tour_size)
     pool = np.array(pool)
-    pool = pool[pool[:, 1].argsort()[::-1]]
+    pool = pool[pool[:, -1].argsort()[::-1]]
     return pool[0]
 
 def sel_survivors_elite(elite_percent, parents, offspring):
