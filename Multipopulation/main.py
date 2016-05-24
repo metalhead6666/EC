@@ -5,40 +5,59 @@ from random import sample
 import numpy as np
 
 
-def solutions_exchanged(prob_mutation, prob_crossover, num_runs, pop_size, elite_percent, tour_size, generations, knapsack_capacity, number_objects, objects_weight, objects_profit):
+def run(prob_mutation, prob_crossover, num_runs, pop_size, elite_percent, tour_size, generations, knapsack_capacity, number_objects, objects_weight, objects_profit, change_solutions, percentage_change, type_algorithm):
 	# last position of indiv is the fitness profit
 	# previous last position of indiv is the fitness weight
+	size = int(pop_size * percentage_change)
+
 	for i in range(num_runs):
 		population = initialization_indiv(pop_size, number_objects)
+		population2 = initialization_indiv(pop_size, number_objects)
 
 		for i in range(len(population)):
 			population[i][-1], population[i][-2] = fitness(population[i], knapsack_capacity, number_objects, objects_weight, objects_profit)
+			population2[i][-1], population2[i][-2] = fitness(population2[i], knapsack_capacity, number_objects, objects_weight, objects_profit)
 
 		for i in range(generations):
 			mate_pool = tour_selection(tour_size, population, number_objects)
+			mate_pool2 = tour_selection(tour_size, population2, number_objects)
 
 			offspring = []
+			offspring2 = []
 			for j in range(0, pop_size - 1):
 				indiv1 = mate_pool[j]
 				indiv2 = mate_pool[j + 1]
 				sons = crossover(indiv1, indiv2, prob_crossover)
 				offspring.extend(sons)
+
+				indiv1 = mate_pool2[j]
+				indiv2 = mate_pool2[j + 1]
+				sons = crossover2(indiv1, indiv2, prob_crossover)
+				offspring2.extend(sons)				
 			offspring = np.array(offspring)
+			offspring2 = np.array(offspring2)
 
 			for j in range(len(offspring)):
 				offspring[j] = mutation(offspring[j], prob_mutation)
-				offspring[j][-1], offspring[j][-2] = fitness(offspring[j], knapsack_capacity, number_objects, objects_weight, objects_profit)				
+				offspring[j][-1], offspring[j][-2] = fitness(offspring[j], knapsack_capacity, number_objects, objects_weight, objects_profit)
+
+				offspring2[j] = mutation2(offspring2[j], prob_mutation)
+				offspring2[j][-1], offspring2[j][-2] = fitness(offspring2[j], knapsack_capacity, number_objects, objects_weight, objects_profit)	
 
 			population = sel_survivors_elite(elite_percent, population, offspring)
+			population2 = sel_survivors_elite(elite_percent, population2, offspring2)
+
+			if np.random.random() < change_solutions:
+				if type_algorithm:
+					exchange_solutions(population, population2, size)
+				else:
+					random_individuals(population, population2, size, number_objects)
 
 		for i in range(len(population)):
 			population[i][-1], population[i][-2] = fitness(population[i], knapsack_capacity, number_objects, objects_weight, objects_profit)
+			population2[i][-1], population2[i][-2] = fitness(population2[i], knapsack_capacity, number_objects, objects_weight, objects_profit)
 
-		print(best_individual(population))
-
-
-def random_individuals(prob_mutation, prob_crossover, num_runs, pop_size, elite_percent, tour_size, generations, knapsack_capacity, number_objects, objects_weight, objects_profit):
-	pass
+		print(best_individual(population, population2))		
 
 def initialization_indiv(pop_size, number_objects):
 	population = np.random.randint(2, size = (pop_size, number_objects + 2), dtype = np.int)
@@ -58,6 +77,26 @@ def crossover(indiv1, indiv2, prob_crossover):
 		cut_index = np.random.randint(1, len(indiv1) - 2)
 		newIndiv1 = np.append(indiv1[:cut_index], indiv2[cut_index:], axis = 0)
 		newIndiv2 = np.append(indiv2[:cut_index], indiv1[cut_index:], axis = 0)
+		newIndiv1[-1] = newIndiv1[-2] = 0
+		newIndiv2[-1] = newIndiv2[-2] = 0
+		return newIndiv1, newIndiv2
+	return indiv1, indiv2
+
+def mutation2(indiv, prob_mutation):
+	if np.random.random() < prob_mutation:
+		for i in range(len(indiv) - 2):
+			indiv[i] ^= 1
+
+	indiv[-1] = indiv[-2] = 0
+	return indiv
+
+def crossover2(indiv1, indiv2, prob_crossover):
+	if np.random.random() < prob_crossover:
+		cut_index = sample(range(len(indiv1) - 2), 2)
+		cut_index.sort()
+		cut_index1, cut_index2 = cut_index
+		newIndiv1 = np.concatenate((indiv1[:cut_index1], indiv2[cut_index1:cut_index2], indiv1[cut_index2:]), axis = 0)
+		newIndiv2 = np.concatenate((indiv2[:cut_index1], indiv1[cut_index1:cut_index2], indiv2[cut_index2:]), axis = 0)
 		newIndiv1[-1] = newIndiv1[-2] = 0
 		newIndiv2[-1] = newIndiv2[-2] = 0
 		return newIndiv1, newIndiv2
@@ -99,16 +138,28 @@ def fitness(indiv, knapsack_capacity, number_objects, objects_weight, objects_pr
 
 	return fitness_profit, fitness_weight
 
-def best_individual(population):
+def best_individual(population, population2):
 	population = population[population[:, -1].argsort()[::-1]]
-	#print(population)
-	return population[0]
+	population2 = population2[population2[:, -1].argsort()[::-1]]
 
-def change_individuals():
-	pass
+	if population[0][-1] > population2[0][-1]:
+		return population[0]
 
-def introduce_random_indiv():
-	pass
+	return population2[0]
+
+def exchange_solutions(population, population2, size):	
+	temp = population[:size]
+	population[:size] = population2[:size]
+	population2[:size] = temp
+	return population, population2
+
+def random_individuals(population, population2, size, number_objects):
+	population = population[population[:, -1].argsort()]
+	population2 = population2[population2[:, -1].argsort()]
+	
+	population[:size] = initialization_indiv(size, number_objects)
+	population2[:size] = initialization_indiv(size, number_objects)
+	return population, population2
 
 
 if __name__ == '__main__':
@@ -119,9 +170,14 @@ if __name__ == '__main__':
 	elite_percent = 0.05
 	tour_size = int(pop_size * 0.01)
 	generations = 100
+	change_solutions = 0.3
+	percentage_change = 0.1
+
+	# exchange solutions = True
+	# random individuals = False
+	type_algorithm = True
 
 	file_number = 8
 	knapsack_capacity, number_objects, objects_weight, objects_profit = file_parser(file_number)
 
-	solutions_exchanged(prob_mutation, prob_crossover, num_runs, pop_size, elite_percent, tour_size, generations, knapsack_capacity, number_objects, objects_weight, objects_profit)
-	#random_individuals(prob_mutation, prob_crossover, num_runs, pop_size, elite_percent, tour_size, generations, knapsack_capacity, number_objects, objects_weight, objects_profit)
+	run(prob_mutation, prob_crossover, num_runs, pop_size, elite_percent, tour_size, generations, knapsack_capacity, number_objects, objects_weight, objects_profit, change_solutions, percentage_change, type_algorithm)
