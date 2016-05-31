@@ -1,0 +1,2 @@
+NormaltestResult(statistic=1.0740154974000349, pvalue=0.58449459303177176)
+Ttest_indResult(statistic=-0.083652801995693207, pvalue=0.93362054219746216)
