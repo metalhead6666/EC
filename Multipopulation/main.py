@@ -1,6 +1,8 @@
 #! /usr/bin/env python3
 
 from file_parser import file_parser
+from statistical_analysis import statistical_analysis
+from create_csv import create_csv
 from math import ceil
 from random import sample
 import numpy as np
@@ -10,16 +12,17 @@ def run(prob_mutation, prob_crossover, num_runs, pop_size, elite_percent, tour_s
 	# last position of indiv is the fitness profit
 	# previous last position of indiv is the fitness weight
 	size = int(pop_size * percentage_change)
+	best_runs = np.zeros(num_runs, dtype = np.int)
 
 	for i in range(num_runs):
 		population = initialization_indiv(pop_size, number_objects)
 		population2 = initialization_indiv(pop_size, number_objects)
 
-		for i in range(len(population)):
-			population[i][-1], population[i][-2] = fitness(population[i], knapsack_capacity, number_objects, objects_weight, objects_profit)
-			population2[i][-1], population2[i][-2] = fitness(population2[i], knapsack_capacity, number_objects, objects_weight, objects_profit)
+		for k in range(len(population)):
+			population[k][-1], population[k][-2] = fitness(population[k], knapsack_capacity, number_objects, objects_weight, objects_profit)
+			population2[k][-1], population2[k][-2] = fitness(population2[k], knapsack_capacity, number_objects, objects_weight, objects_profit)
 
-		for i in range(generations):
+		for k in range(generations):
 			mate_pool = tour_selection(tour_size, population, number_objects)
 			mate_pool2 = tour_selection(tour_size, population2, number_objects)
 
@@ -54,11 +57,14 @@ def run(prob_mutation, prob_crossover, num_runs, pop_size, elite_percent, tour_s
 				else:
 					random_individuals(population, population2, size, number_objects)
 
-		for i in range(len(population)):
-			population[i][-1], population[i][-2] = fitness(population[i], knapsack_capacity, number_objects, objects_weight, objects_profit)
-			population2[i][-1], population2[i][-2] = fitness(population2[i], knapsack_capacity, number_objects, objects_weight, objects_profit)
+		for k in range(len(population)):
+			population[k][-1], population[k][-2] = fitness(population[k], knapsack_capacity, number_objects, objects_weight, objects_profit)
+			population2[k][-1], population2[k][-2] = fitness(population2[k], knapsack_capacity, number_objects, objects_weight, objects_profit)
 
-		print(best_individual(population, population2))		
+		indiv = best_individual(population, population2)
+		best_runs[i] = indiv[-1]
+
+	return best_runs
 
 def initialization_indiv(pop_size, number_objects):
 	population = np.random.randint(2, size = (pop_size, number_objects + 2), dtype = np.int)
@@ -173,8 +179,8 @@ if __name__ == '__main__':
 	elite_percent = 0.05
 	tour_size = ceil(pop_size * 0.01)
 	generations = 10
-	change_solutions = 0.5
-	percentage_change = 0.2
+	change_solutions = 0.6
+	percentage_change = 0.9
 
 	# exchange solutions = True
 	# random individuals = False
@@ -183,4 +189,9 @@ if __name__ == '__main__':
 	file_number = 8
 	knapsack_capacity, number_objects, objects_weight, objects_profit = file_parser(file_number)
 
-	run(prob_mutation, prob_crossover, num_runs, pop_size, elite_percent, tour_size, generations, knapsack_capacity, number_objects, objects_weight, objects_profit, change_solutions, percentage_change, type_algorithm)
+	bests1 = run(prob_mutation, prob_crossover, num_runs, pop_size, elite_percent, tour_size, generations, knapsack_capacity, number_objects, objects_weight, objects_profit, change_solutions, percentage_change, True)
+	bests2 = run(prob_mutation, prob_crossover, num_runs, pop_size, elite_percent, tour_size, generations, knapsack_capacity, number_objects, objects_weight, objects_profit, change_solutions, percentage_change, False)
+	
+	filestat = "Results/" + str(change_solutions) + "_" + str(percentage_change) + ".csv"
+	create_csv(bests1, bests2, filestat)
+	statistical_analysis(filestat)
