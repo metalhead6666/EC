@@ -179,19 +179,19 @@ if __name__ == '__main__':
 	elite_percent = 0.05
 	tour_size = ceil(pop_size * 0.01)
 	generations = 10
-	change_solutions = 0.6
-	percentage_change = 0.9
+	change_solutions = 0.5
+	percentage_change = 0.5
 
 	# exchange solutions = True
 	# random individuals = False
 	type_algorithm = True
 
-	file_number = 8
+	file_number = 7
 	knapsack_capacity, number_objects, objects_weight, objects_profit = file_parser(file_number)
 
 	bests1 = run(prob_mutation, prob_crossover, num_runs, pop_size, elite_percent, tour_size, generations, knapsack_capacity, number_objects, objects_weight, objects_profit, change_solutions, percentage_change, True)
 	bests2 = run(prob_mutation, prob_crossover, num_runs, pop_size, elite_percent, tour_size, generations, knapsack_capacity, number_objects, objects_weight, objects_profit, change_solutions, percentage_change, False)
 	
-	filestat = "Results/" + str(change_solutions) + "_" + str(percentage_change) + ".csv"
+	filestat = "Results/" + str(file_number) + "_" + str(change_solutions) + "_" + str(percentage_change) + ".csv"
 	create_csv(bests1, bests2, filestat)
 	statistical_analysis(filestat)
