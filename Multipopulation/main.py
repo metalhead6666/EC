@@ -179,19 +179,25 @@ if __name__ == '__main__':
 	elite_percent = 0.05
 	tour_size = ceil(pop_size * 0.01)
 	generations = 10
-	change_solutions = 0.5
-	percentage_change = 0.5
+	change_solutions = [0.1, 0.25, 0.5, 0.75]
+	percentage_change = [0.1, 0.25, 0.5, 0.75]
 
 	# exchange solutions = True
 	# random individuals = False
-	type_algorithm = True
+	# type_algorithm = True
 
-	file_number = 7
-	knapsack_capacity, number_objects, objects_weight, objects_profit = file_parser(file_number)
+	file_number = [7, 8]
+	folderstat = "Results/"
 
-	bests1 = run(prob_mutation, prob_crossover, num_runs, pop_size, elite_percent, tour_size, generations, knapsack_capacity, number_objects, objects_weight, objects_profit, change_solutions, percentage_change, True)
-	bests2 = run(prob_mutation, prob_crossover, num_runs, pop_size, elite_percent, tour_size, generations, knapsack_capacity, number_objects, objects_weight, objects_profit, change_solutions, percentage_change, False)
-	
-	filestat = "Results/" + str(file_number) + "_" + str(change_solutions) + "_" + str(percentage_change) + ".csv"
-	create_csv(bests1, bests2, filestat)
-	statistical_analysis(filestat)
+	for number_file in file_number:
+		for solutions_change in change_solutions:
+			for change_percentage in percentage_change:
+				knapsack_capacity, number_objects, objects_weight, objects_profit = file_parser(number_file)
+
+				bests1 = run(prob_mutation, prob_crossover, num_runs, pop_size, elite_percent, tour_size, generations, knapsack_capacity, number_objects, objects_weight, objects_profit, solutions_change, change_percentage, True)
+				bests2 = run(prob_mutation, prob_crossover, num_runs, pop_size, elite_percent, tour_size, generations, knapsack_capacity, number_objects, objects_weight, objects_profit, solutions_change, change_percentage, False)
+								
+				filestat = str(number_file) + "_" + str(solutions_change) + "_" + str(change_percentage) + ".csv"
+				create_csv(bests1, bests2, folderstat + filestat)
+				statistical_analysis(folderstat, filestat, False)
+				print("Done: " + filestat)
