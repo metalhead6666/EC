@@ -182,10 +182,6 @@ if __name__ == '__main__':
 	change_solutions = [0.1, 0.25, 0.5, 0.75]
 	percentage_change = [0.1, 0.25, 0.5, 0.75]
 
-	# exchange solutions = True
-	# random individuals = False
-	# type_algorithm = True
-
 	file_number = [7, 8]
 	folderstat = "Results/"
 
